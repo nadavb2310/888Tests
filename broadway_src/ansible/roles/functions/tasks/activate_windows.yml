@@ -1,0 +1,15 @@
+# tasks file for changeproductkey
+- name: Insert New Product Key
+  win_command: "cscript c:\\windows\\system32\\slmgr.vbs -ipk 7C6BN-9C9B9-3GM8M-FX7QY-X4QWW"
+
+- pause:
+    minutes: 1
+
+- name: Activate windows
+  win_command: "cscript c:\\windows\\system32\\slmgr.vbs -ato"
+
+- pause:
+    minutes: 1
+
+- name: Show New Product Key
+  win_command: "cscript c:\\windows\\system32\\slmgr.vbs /dli"

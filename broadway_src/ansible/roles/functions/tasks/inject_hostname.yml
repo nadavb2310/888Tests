@@ -1,0 +1,20 @@
+- name: stop IIS before injection
+  win_command: iisreset /stop
+
+- name: stop "{{ siteName }}" site before injection
+  win_shell: |
+    C:\Windows\System32\inetsrv\appcmd stop site {{ siteName }}
+
+- name: Set env_name if not defined
+  set_fact: env_name="{{ env }}"
+  when: env is defined and env_name is not defined
+  
+- name: start "{{ siteName }}" site after injection
+  win_shell: |
+      C:\Windows\System32\inetsrv\appcmd start site {{ siteName }}
+
+- name: start IIS after injection
+  win_command: iisreset /start
+  retries: 10
+  delay: 15
+    

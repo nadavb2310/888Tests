@@ -1,0 +1,14 @@
+- name: "Install DotNet Framework"
+  win_chocolatey: 
+    name: "dotnet{{ Dotnet_Version }}"
+    state: latest
+  register: dotnet_output
+  failed_when: "dotnet_output.rc != 0 and dotnet_output.rc != 3010"
+  when: "Dotnet_Version is defined"
+
+- name: Reboot after dotnet installation
+  win_reboot:
+    reboot_timeout_sec: 1500
+  when: 
+    - dotnet_output.rc is defined
+    - dotnet_output.rc == 3010

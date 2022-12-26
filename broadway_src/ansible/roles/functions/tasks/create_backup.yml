@@ -1,0 +1,16 @@
+- name: stop IIS
+  win_command: iisreset /stop
+
+- name: stop "{{ siteName }}" site
+  win_shell: |
+    C:\Windows\System32\inetsrv\appcmd stop site {{ siteName }}
+
+- name: start "{{ siteName }}" site
+  win_shell: |
+    C:\Windows\System32\inetsrv\appcmd start site {{ siteName }}
+
+- name: start IIS after backup
+  win_command: iisreset /start
+  retries: 10
+  delay: 15
+  

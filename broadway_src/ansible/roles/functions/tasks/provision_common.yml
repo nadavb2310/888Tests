@@ -1,0 +1,76 @@
+---
+- name: Rename host
+  import_role:
+    name: functions
+    tasks_from: aws_rename_host
+  when: is_aws_environment
+  tags: rename_host
+
+# - name: Rename host
+#   import_role:
+#     name: functions
+#     tasks_from: set_hostname
+#   when: is_aws_environment == false
+#   tags: rename_host
+
+- name: Rename host
+  import_role:
+    name: functions
+    tasks_from: europe_domain_host
+  when: is_aws_environment == false
+  tags: add_to_europe_domain
+
+- name: initialize
+  import_role:
+    name: functions
+    tasks_from: initialize
+  tags: provision
+
+- name: enable IIS
+  import_role:
+    name: functions
+    tasks_from: enable_iis
+  tags: enable_iis
+
+- name: install .NET
+  import_role:
+   name: functions
+   tasks_from: install_dotnet
+  tags: provision
+
+- name: install redistributables
+  import_role:
+    name: functions
+    tasks_from: install_redist
+  tags: provision
+
+- name: install soss
+  import_role:
+    name: functions
+    tasks_from: install_soss
+  tags: install_soss
+
+- name: run windows update
+  import_role:
+    name: functions
+    tasks_from: win_updates
+  tags: provision
+
+- set_fact: 
+     REMOTE_PATH: "{{ REMOTE_PATH }}"
+     SITE_NAME: "{{ SITE_NAME }}" 
+     bind_ip: "{{ bind_ip }}" 
+     bind_port: "{{ bind_port }}"
+  tags: enable_iis
+
+- name: "Create {{ SITE_NAME }} site and app pool"
+  import_role:
+    name: functions
+    tasks_from: create_site
+  tags: enable_iis
+
+- name: add cultures
+  import_role:
+    name: functions
+    tasks_from: add_new_culture
+  tags: provision
