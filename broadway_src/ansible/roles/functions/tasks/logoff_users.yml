@@ -1,0 +1,21 @@
+- name: Warn logged in users of impending deploy
+  win_msg:
+    display_seconds: 10
+    msg: "{{ PRODUCT }} deploy is about to start. Please save your work and log off."
+
+- name: Copy logoffUsers sctipt
+  win_copy:
+    src: ../scripts/logoffUsers.ps1
+    dest: C:\logoffUsers.ps1
+
+- name: Logoff all users
+  win_shell: C:\logoffUsers.ps1
+  run_once: true
+  failed_when: false
+
+- name: Remove directory structure
+  win_file:
+    path: C:\logoffUsers.ps1
+    state: absent
+  run_once: true
+  failed_when: false

@@ -1,0 +1,50 @@
+- name: enable IIS
+  win_shell: |
+    Install-WindowsFeature -Name Web-Server -IncludeAllSubFeature -IncludeManagementTools -source C:\\Windows\\WinSxS
+
+- name: Reboot after IIS installation
+  win_reboot:
+    reboot_timeout_sec: 1500
+  when: disable_webdav_out.stdout.find("Restart Needed") != -1
+  
+- name: Remove redundent Application pools
+  win_iis_webapppool:
+    name:  "{{ item }}"
+    state: absent
+  with_items:
+    - "Default Web Site"
+    - "DefaultAppPool"
+    - "Classic .NET AppPool"
+    - ".NET v2.0"
+    - ".NET v2.0 Classic"
+    - ".NET v4.5"
+    - ".NET v4.5 Classic"
+
+- name: Remove Default Web Site
+  win_iis_website:
+    name: "Default Web Site"
+    state: absent
+
+- name: Create shortcuts on the desktop
+  win_shortcut:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    args: "{{ item.args }}"
+    icon: "{{ item.icon }}"
+  with_items:
+    - { src: 'C:\Windows\system32\inetsrv\InetMgr.exe', dest: 'C:\Users\Public\Desktop\Internet Information Services (IIS) Manager.lnk',args: , icon: 'C:\Windows\system32\inetsrv\InetMgr.exe,0'}
+    - { src: 'C:\Windows\System32\iisreset.exe', dest: 'C:\Users\Public\Desktop\IIS Reset.lnk',args: , icon: 'C:\Windows\System32\SHELL32.dll,238'}
+    - { src: 'C:\Windows\System32\iisreset.exe', dest: 'C:\Users\Public\Desktop\IIS Stop.lnk',args: /stop, icon: 'C:\Windows\System32\SHELL32.dll,109'}
+    - { src: 'C:\Windows\System32\iisreset.exe', dest: 'C:\Users\Public\Desktop\IIS Start.lnk',args: /start, icon: 'C:\Windows\System32\SHELL32.dll,137'}
+
+- name: Run as Administrator
+  win_shell: |
+    $ShortcutFile = "{{ item }}"
+    $bytes = [IO.File]::ReadAllBytes("$ShortcutFile") 
+    $bytes[0x15] = $bytes[0x15] -bor 0x20 #set byte 21 (0x15) bit 6 (0x20) ON 
+    [IO.File]::WriteAllBytes("$ShortcutFile", $bytes)
+  with_items:
+    - 'C:\Users\Public\Desktop\IIS Reset.lnk'
+    - 'C:\Users\Public\Desktop\IIS Stop.lnk'
+    - 'C:\Users\Public\Desktop\IIS Start.lnk'
+

@@ -1,0 +1,30 @@
+- name: stop IIS before backup
+  win_command: iisreset /stop
+
+- name: stop "{{ siteName }}" site before backup
+  win_shell: |
+    C:\Windows\System32\inetsrv\appcmd stop site {{ siteName }}
+
+- name: Create back up Toluna "{{ SITE_TARGET_PATH }}" folder
+  win_shell: |
+    if(Test-Path "{{ SITE_TARGET_PATH }}_Backup") {
+      Remove-Item "{{ SITE_TARGET_PATH }}_Backup" -Recurse
+    }
+    if(Test-Path "{{ SITE_TARGET_PATH }}") {
+      Copy-Item "{{ SITE_TARGET_PATH }}" "{{ SITE_TARGET_PATH }}_Backup" -Recurse
+      Remove-Item "{{ SITE_TARGET_PATH }}" -Recurse
+    }
+  register: task_result
+  until: task_result|succeeded
+  retries: 5
+  delay: 30
+
+- name: start "{{ siteName }}" site after backup
+  win_shell: |
+    C:\Windows\System32\inetsrv\appcmd start site {{ siteName }}
+
+- name: start IIS after backup
+  win_command: iisreset /start
+  retries: 10
+  delay: 15
+  

@@ -1,0 +1,14 @@
+---
+WORKSPACE: "{{ lookup('env', 'WORKSPACE') }}"
+PACKAGE_URL: "{{ lookup('env', 'artifactURL') }}"
+PACKAGE: "{{ lookup('env', 'selectedPackage') }}"
+ASPX:   "<html>
+          <head>
+            <title>Toluna</title>
+          </head>
+          <body>
+            <form>
+              <div>We appreciate your interest</div>
+            </form>
+          </body>
+         </html>"

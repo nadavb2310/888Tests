@@ -1,0 +1,15 @@
+---
+- hosts: all
+  pre_tasks:
+    - debug:
+        msg: this is pre task block
+  
+  gather_facts: true
+  roles:
+    - broadway_flow
+
+
+
+
+#finish yaml symbol
+...
