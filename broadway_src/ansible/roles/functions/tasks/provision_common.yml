@@ -19,12 +19,6 @@
   tags: provision
 
 
-- name: run windows update
-  import_role:
-    name: functions
-    tasks_from: win_updates
-  tags: provision
-
 - set_fact: 
      REMOTE_PATH: "{{ REMOTE_PATH }}"
      SITE_NAME: "{{ SITE_NAME }}" 
@@ -37,9 +31,3 @@
     name: functions
     tasks_from: create_site
   tags: enable_iis
-
-- name: add cultures
-  import_role:
-    name: functions
-    tasks_from: add_new_culture
-  tags: provision
