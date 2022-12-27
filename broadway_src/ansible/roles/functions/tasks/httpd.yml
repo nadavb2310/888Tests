@@ -20,6 +20,18 @@
 ## ...
 ## 
 
+
+- name: Install Apache package
+  package:
+    name: apache2
+    state: present # to ensure apache is installed
+    failed_when: apache2 is installed # skip whether its already installed.
+
+- name: Start Apache service # this task refers to the first time after installation
+  shell: service apache2 start
+  failed_when: apache2 is installed
+
+
 - name: httpd installed
   ansible.builtin.yum:
     name: httpd

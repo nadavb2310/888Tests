@@ -1,0 +1,35 @@
+- name: Check if inside AWS (Windows).
+  win_uri:
+    url: http://169.254.169.254/latest/meta-data
+    timeout: 5
+  register: aws_uri_check_win
+  tags: always
+  ignore_errors: true
+  when: ansible_os_family == "Windows"
+
+- name: Check if inside AWS (Linux).
+  uri:
+    url: http://169.254.169.254/latest/meta-data
+    timeout: 5
+  register: aws_uri_check_linux
+  tags: always
+  ignore_errors: true
+  when: ansible_os_family != "Windows"
+
+- set_fact:
+    is_aws_environment: false
+  tags: always
+  when: is_aws_environment is not defined
+
+- set_fact:
+    is_aws_environment: "{{ aws_uri_check_linux.status == 200 }}"
+  tags: always
+  when: ansible_os_family != "Windows"
+  ignore_errors: true
+
+- set_fact:
+    is_aws_environment: "{{ aws_uri_check_win.status_code == 200 }}"
+  tags: always
+  when: ansible_os_family == "Windows"
+  ignore_errors: true
+
