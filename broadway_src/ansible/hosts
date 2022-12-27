@@ -1,0 +1,23 @@
+[all:vars]
+ansible_ssh_private_key_file=/path/to/private_key
+
+[888_service_linux]
+888_service_linux ansible_host="127.0.0.1" bind_ip="127.0.0.1" ansible_user=root
+
+[888_service_linux:vars]
+tag_Product="888_service_linux"
+bind_port="8080"
+ansible_port=5986
+
+
+[888_service_win]
+888_service_win ansible_host="10.0.62.206" bind_ip="10.0.62.206" ansible_user=Vagrant
+
+[888_service_win:vars]
+tag_Product="888_service_win"
+
+#Ansible vars
+bind_port="2221"
+ansible_port=5986
+ansible_connection=winrm 
+ansible_winrm_server_cert_validation=ignore

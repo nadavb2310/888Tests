@@ -8,7 +8,6 @@
     groups: ["Users, Administrators"]
     password_never_expires: yes
     state: present
-  when: is_aws_environment
 
 - name: Run as Administrator
   win_shell: |
@@ -20,21 +19,10 @@
     - 'C:\Users\Public\Desktop\cmd.lnk'
     - 'C:\Users\Public\Desktop\Notepad++.lnk'
 
-- name: Copy logon script
-  win_copy:
-    src: ../scripts/pin2tb.ps1
-    dest: C:\Users\Public\pin2tb.ps1
 
-- name: Set logon script to run for each user
-  win_shell: |
-    reg load HKU\DefUser 'c:\Users\Default\NTUSER.DAT'
-    reg add HKU\DefUser\Software\Microsoft\Windows\CurrentVersion\Runonce /v Pin2TB /t REG_EXPAND_SZ /d 'powershell -windowstyle hidden c:\Users\Public\pin2tb.ps1' /f
-    reg unload HKU\DefUser
-
-
+# only for win
 - name: Disable Server Manager from running at startup for each user
   win_shell: Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask -Verbose
-  when: is_aws_environment
 
 - name: Install Telnet
   win_shell: |
@@ -42,17 +30,7 @@
   ignore_errors: true
 
 
-
 - name: Wait for ansible connection to host
   wait_for_connection:
     delay: 7
     timeout: 60
-  when: is_aws_environment
-
-- name: Set secondary IP on AWS
-  win_command: "netsh interface ipv4 add address Ethernet {{ secondary_ip }} 255.255.255.0"
-  when: secondary_ip is defined and is_aws_environment
-
-- name: Set DNS on AWS
-  win_command: "netsh interface ip set dns Ethernet static {{ first_two_bytes }}.0.2"
-  when: secondary_ip is defined and is_aws_environment

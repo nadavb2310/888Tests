@@ -1,0 +1,57 @@
+
+# remark - had troubles to create Centos - 
+# in case that i had one, i would use jinja to change listen section in conf file of httpd.
+# ANSIBLE: 
+## - replace:
+##  # path: /path/to/file
+##  # regexp: 'string or regular expression for search'
+##  # replace: 'word to replace the search string'
+##  # backup: yes
+##  
+## EXAMPLE: 
+##
+## Apache HTTP server - main configuration
+##
+##
+## General configuration
+## ServerRoot {{ httpd_server_root }}
+## Listen {{ httpd_listen }} - by replace in ansible i would put a regexp change pattern to change the port and hosrt the web server page
+## ...
+## ...
+## 
+
+
+- name: Install Apache package
+  package:
+    name: apache2
+    state: present # to ensure apache is installed
+    failed_when: apache2 is installed # skip whether its already installed.
+
+- name: Start Apache service # this task refers to the first time after installation
+  shell: service apache2 start
+  failed_when: apache2 is installed
+
+
+- name: httpd installed
+  ansible.builtin.yum:
+    name: httpd
+    state: latest
+
+- name: custom index.html
+  ansible.builtin.copy:
+    dest: /var/www/html/index.html
+    content: |
+              Custom Web Page
+
+- name: httpd service enabled
+  ansible.builtin.service:
+    name: httpd
+    enabled: true
+    state: started
+
+- name: open firewall
+  ansible.posix.firewalld:
+    service: http
+    state: enabled
+    immediate: true
+    permanent: true

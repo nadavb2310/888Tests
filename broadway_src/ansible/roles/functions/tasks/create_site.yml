@@ -1,0 +1,23 @@
+- name: Create deploy target directory
+  win_file:
+    path: "{{ REMOTE_PATH }}"
+    state: directory
+
+- name: Create "{{ SITE_NAME }}" Application pool
+  win_iis_webapppool:
+    name:  "{{ SITE_NAME }}"
+    state: started
+    attributes: 
+      managedRuntimeVersion: v4.0
+      autoStart: true
+  register: webapppool
+
+- name: Create "{{ SITE_NAME }}" IIS site
+  win_iis_website:
+    name: "{{ SITE_NAME }}"
+    state: started
+    port: "{{ bind_port }}"
+    ip: "{{ bind_ip }}"
+    application_pool: "{{ SITE_NAME }}"
+    physical_path: "{{ REMOTE_PATH }}"
+  register: website

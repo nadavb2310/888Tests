@@ -31,8 +31,8 @@ def run_top_process():
         message_on_fail = "top command did NOT run"
         writer = csv.writer(monitoring_file_obj, quoting=csv.QUOTE_ALL, delimiter=';')
         try:
-            subprocess.call(f"top -n {NUM_OF_PROCESSES_TO_MONITOR}", shell=True, stdout=output_file)
-            subprocess.call(f"", shell=True)
+            #subprocess.call(f"top -n {NUM_OF_PROCESSES_TO_MONITOR}", shell=True, stdout=output_file)
+            subprocess.call(f"ps -ef | grep top | grep -v grep", shell=True)
             writer.writerow([datetime.now().strftime("%m/%d/%Y, %H:%M:%S") ,message_on_success])
         except Exception as e:
             writer.writerow([str(datetime.now().strftime("%m/%d/%Y, %H:%M:%S")) ,message_on_fail])
